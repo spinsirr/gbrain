@@ -58,6 +58,9 @@ export const CANONICAL_PRICING: Record<string, ModelPricing> = {
   'anthropic:claude-opus-4-7':            { input:  5.00, output: 25.00 },
   'anthropic:claude-opus-4-6':            { input:  5.00, output: 25.00 },
   'anthropic:claude-sonnet-4-6':          { input:  3.00, output: 15.00 },
+  // Sonnet 5 sticker rate; intro pricing ($2/$10) runs through 2026-08-31 —
+  // book the sticker so cost estimates stay conservative after it lapses.
+  'anthropic:claude-sonnet-5':            { input:  3.00, output: 15.00 },
   // Haiku 4.5 — both the dateless canonical id and the dated snapshot.
   'anthropic:claude-haiku-4-5':           { input:  1.00, output:  5.00 },
   'anthropic:claude-haiku-4-5-20251001':  { input:  1.00, output:  5.00 },

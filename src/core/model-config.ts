@@ -73,7 +73,7 @@ export const DEFAULT_ALIASES: Record<string, string> = {
  */
 export const TIER_DEFAULTS: Record<ModelTier, string> = {
   utility:   'anthropic:claude-haiku-4-5-20251001',
-  reasoning: 'anthropic:claude-sonnet-4-6',
+  reasoning: 'anthropic:claude-sonnet-5',
   deep:      'anthropic:claude-opus-4-7',
   subagent:  'anthropic:claude-sonnet-4-6',
 };
