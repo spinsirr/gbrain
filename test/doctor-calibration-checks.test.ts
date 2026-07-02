@@ -55,6 +55,11 @@ function buildMockEngine(opts: {
       }
       return [] as T[];
     },
+    // #2464 integration: checkCalibrationFreshness resolves the owner holder
+    // via getConfig('emotional_weight.user_holder') before querying.
+    async getConfig(): Promise<string | null> {
+      return null;
+    },
   } as unknown as BrainEngine;
 }
 

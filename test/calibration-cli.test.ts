@@ -42,6 +42,11 @@ function buildMockEngine(opts: { rows: CalibrationProfileRow[] }): {
       }
       return matching as unknown as T[];
     },
+    // #2464 integration: the op resolves the default holder via
+    // resolveOwnerHolder(getConfig('emotional_weight.user_holder')).
+    async getConfig(): Promise<string | null> {
+      return null;
+    },
   } as unknown as BrainEngine;
   return { engine, capturedSql, capturedParams };
 }
@@ -211,17 +216,17 @@ describe('formatProfileText', () => {
 // ─── getCalibrationProfileOp ────────────────────────────────────────
 
 describe('getCalibrationProfileOp (MCP)', () => {
-  test('defaults holder to "garry" when omitted', async () => {
-    const { engine } = buildMockEngine({ rows: [buildProfile({ holder: 'garry' })] });
+  test('defaults holder to "self" when omitted (resolveOwnerHolder: override > config > self)', async () => {
+    const { engine } = buildMockEngine({ rows: [buildProfile({ holder: 'self' })] });
     const ctx = buildCtx(engine);
     const result = await getCalibrationProfileOp(ctx, {});
-    expect(result?.holder).toBe('garry');
+    expect(result?.holder).toBe('self');
   });
 
   test('routes through sourceScopeOpts: scalar source-bound client gets source-scoped result', async () => {
     const rows = [
-      buildProfile({ holder: 'garry', source_id: 'default' }),
-      buildProfile({ holder: 'garry', source_id: 'tenant-b' }),
+      buildProfile({ holder: 'self', source_id: 'default' }),
+      buildProfile({ holder: 'self', source_id: 'tenant-b' }),
     ];
     const { engine } = buildMockEngine({ rows });
     const ctx = buildCtx(engine, { sourceId: 'tenant-b' });
@@ -231,8 +236,8 @@ describe('getCalibrationProfileOp (MCP)', () => {
 
   test('federated read scope sees the union of allowed sources', async () => {
     const rows = [
-      buildProfile({ holder: 'garry', source_id: 'tenant-a' }),
-      buildProfile({ holder: 'garry', source_id: 'tenant-z' }),
+      buildProfile({ holder: 'self', source_id: 'tenant-a' }),
+      buildProfile({ holder: 'self', source_id: 'tenant-z' }),
     ];
     const { engine } = buildMockEngine({ rows });
     const ctx = buildCtx(engine, { allowedSources: ['tenant-a', 'tenant-b'] });
