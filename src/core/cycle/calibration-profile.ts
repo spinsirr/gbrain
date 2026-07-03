@@ -142,7 +142,12 @@ export async function defaultPatternsGenerator(input: {
   const result = await gatewayChat({
     messages: [{ role: 'user', content: prompt + feedbackSuffix }],
     ...(input.modelHint ? { model: input.modelHint } : {}),
-    maxTokens: 500,
+    // Sonnet-5-class models run adaptive thinking by default and thinking
+    // spends INSIDE max_tokens (@ai-sdk/anthropic serializes no `disabled`,
+    // only enabled/adaptive) — a tight cap can be consumed entirely by
+    // thinking → empty text → silently parsed as zero results. Output size
+    // is bounded by the parser (4 lines ≤200 chars), not by this cap.
+    maxTokens: 4096,
   });
   return parsePatternStatementsOutput(result.text);
 }
@@ -156,7 +161,9 @@ export async function defaultBiasTagsGenerator(patterns: string[]): Promise<stri
   );
   const result = await gatewayChat({
     messages: [{ role: 'user', content: prompt }],
-    maxTokens: 200,
+    // Same adaptive-thinking headroom as the patterns generator above; the
+    // parser bounds real output (JSON array of short tags), not this cap.
+    maxTokens: 4096,
   });
   return parseBiasTagsOutput(result.text);
 }
